@@ -1,4 +1,4 @@
-# Investor Twin AI 🤖
+# Investor Twin 🤖
 
 Find your investment doppelgänger and get AI-powered portfolio insights.
 
