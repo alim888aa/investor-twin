@@ -1,16 +1,31 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { UsersRound, Search } from 'lucide-react';
+import { Combobox } from '@/components/ui/combobox';
 
 export default function HomePage() {
   const [username, setUsername] = useState('');
   const router = useRouter();
+  const [allUsernames, setAllUsernames] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchUsernames = async () => {
+      try {
+        const response = await fetch("/api/users");
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setAllUsernames(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch usernames:", error);
+      }
+    };
+    fetchUsernames();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,20 +48,17 @@ export default function HomePage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="username" className="text-sm font-medium">Username</Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="e.g., glopez"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="w-full"
-                aria-describedby="username-description"
-              />
-              <p id="username-description" className="sr-only">Enter your username to find investor twins.</p>
-            </div>
+          <Combobox
+            items={allUsernames.map((name) => ({
+              value: name,
+              label: name,
+            }))}
+            value={username}
+            onSelect={setUsername}
+            searchPlaceholder="Search username..."
+            notFoundMessage="Loading.."
+            selectButtonText="Select a username"
+          />
             <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" disabled={!username.trim()}>
               <Search size={18} className="mr-2" />
               Find My Twins
