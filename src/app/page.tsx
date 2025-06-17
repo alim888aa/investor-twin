@@ -38,7 +38,7 @@ export default function HomePage() {
               <Input
                 id="username"
                 type="text"
-                placeholder="e.g., investor123"
+                placeholder="e.g., glopez"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -53,9 +53,6 @@ export default function HomePage() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="text-center text-xs text-muted-foreground">
-          <p>Powered by AI Insights</p>
-        </CardFooter>
       </Card>
     </main>
   );

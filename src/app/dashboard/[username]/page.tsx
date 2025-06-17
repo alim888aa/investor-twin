@@ -14,9 +14,15 @@ interface Twin {
   score: number;
 }
 
+interface AnalysisReport {
+  sharedStrategy: string;
+  keyDifference: string[];
+  potentialOpportunity: string;
+}
+
 interface DashboardData {
   twins: Twin[];
-  analysis: string;
+  analysis: AnalysisReport | string;
 }
 
 export default function DashboardPage() {
@@ -81,8 +87,10 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <p className="text-destructive-foreground">{error}</p>
-            <Button onClick={() => window.location.reload()} variant="destructive" className="mt-4">
+            <Button variant="destructive" className="mt-4">
+              <Link href="/">
               Try Again
+              </Link>
             </Button>
           </CardContent>
         </Card>
@@ -133,21 +141,43 @@ export default function DashboardPage() {
             </CardTitle>
             <CardDescription>Insights based on your and your twins' strategies.</CardDescription>
           </CardHeader>
+                    
           <CardContent>
             {loading ? (
               <div className="space-y-3">
                 <Skeleton className="h-5 w-full" />
                 <Skeleton className="h-5 w-full" />
                 <Skeleton className="h-5 w-4/5" />
-                <Skeleton className="h-5 w-full" />
-                <Skeleton className="h-5 w-3/5" />
               </div>
-            ) : data?.analysis ? (
-              <blockquote className="p-4 border-l-4 border-accent bg-accent/10 rounded-r-md text-foreground">
-                <p className="whitespace-pre-wrap leading-relaxed font-body">{data.analysis}</p>
-              </blockquote>
-            ) : !loading && (
-              <p className="text-muted-foreground">AI analysis is not available at the moment.</p>
+            ) : data?.analysis && typeof data.analysis === "object" ? (
+              <div className="space-y-4 text-sm">
+                <div>
+                  <h4 className="font-semibold text-primary">Shared Strategy</h4>
+                  <p className="text-muted-foreground">{data.analysis.sharedStrategy}</p>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-primary">Key Differences</h4>
+                  <ul className="list-disc list-inside text-muted-foreground">
+                    {data.analysis.keyDifference.map((stock, i) => (
+                      <li key={i}>{stock}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-primary">Potential Opportunity</h4>
+                  <p className="text-muted-foreground">
+                    {data.analysis.potentialOpportunity}
+                  </p>
+                </div>
+              </div>
+            ) : data?.analysis && typeof data.analysis === "string" ? (
+              <p className="text-muted-foreground">{data.analysis}</p>
+            ) : (
+              !loading && (
+                <p className="text-muted-foreground">
+                  AI analysis is not available at the moment.
+                </p>
+              )
             )}
           </CardContent>
         </Card>

@@ -13,18 +13,32 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const AnalyzeInvestmentStrategiesInputSchema = z.object({
-  username: z.string().describe('The username of the investor.'),
-  twins: z.array(
-    z.object({
-      name: z.string().describe('The name of the investor twin.'),
-      score: z.number().describe('The similarity score of the investor twin.'),
-    })
-  ).describe('An array of investor twins with their names and similarity scores.'),
+  userPortfolio: z
+    .array(z.string())
+    .describe("An array of stock symbols in the user's portfolio."),
+  twinPortfolio: z
+    .array(z.string())
+    .describe("An array of stock symbols in the top twin's portfolio."),
+  twinName: z.string().describe("The name of the top investor twin."),
 });
 export type AnalyzeInvestmentStrategiesInput = z.infer<typeof AnalyzeInvestmentStrategiesInputSchema>;
 
 const AnalyzeInvestmentStrategiesOutputSchema = z.object({
-  analysis: z.string().describe('A detailed analysis of the investment strategies, highlighting similarities and potential new investments.'),
+  sharedStrategy: z
+    .string()
+    .describe(
+      "A one-sentence summary of the primary investment strategy or industry these two portfolios share.",
+    ),
+  keyDifference: z
+    .array(z.string())
+    .describe(
+      "A list of the specific stock symbols that the twin owns, but the user does not.",
+    ),
+  potentialOpportunity: z
+    .string()
+    .describe(
+      "A one or two-sentence suggestion on why the user might consider looking into the differing stocks.",
+    ),
 });
 export type AnalyzeInvestmentStrategiesOutput = z.infer<typeof AnalyzeInvestmentStrategiesOutputSchema>;
 
@@ -36,15 +50,14 @@ const prompt = ai.definePrompt({
   name: 'analyzeInvestmentStrategiesPrompt',
   input: {schema: AnalyzeInvestmentStrategiesInputSchema},
   output: {schema: AnalyzeInvestmentStrategiesOutputSchema},
-  prompt: `You are an expert financial analyst. Analyze the investment strategies of the user {{username}} and their investor twins to provide a detailed report highlighting similarities and potential new investments.
+  prompt: `You are a helpful and concise financial analyst. A user's portfolio consists of these stocks: [{{#each userPortfolio}}{{.}}, {{/each}}]. Their top investment twin, {{twinName}}, has this portfolio: [{{#each twinPortfolio}}{{.}}, {{/each}}].
 
-User: {{username}}
-Investor Twins:
-{{#each twins}}
-- Name: {{name}}, Similarity Score: {{score}}
-{{/each}}
+  Based on this, provide a short, three-part analysis:
 
-Analysis:`,
+  1.  **Shared Strategy:** In one sentence, what is the primary investment strategy or industry these two portfolios have in common?
+  2.  **Key Difference:** List the specific stocks that {{twinName}} owns, but the user does not.
+  3.  **Potential Opportunity:** In one or two sentences, suggest why the user might consider looking into these differing stocks, focusing on diversification or exposure to new sectors.`,
+  // ...
 });
 
 const analyzeInvestmentStrategiesFlow = ai.defineFlow(
