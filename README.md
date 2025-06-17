@@ -6,7 +6,7 @@ Find your investment doppelgänger and get AI-powered portfolio insights.
 
 ### [Demo Link](https://studio--investor-twin-finder.us-central1.hosted.app/)
 
-### [Video]([])
+### [Video](https://youtu.be/-ltCVmMVf3U)
 
 ## Application Description
 
